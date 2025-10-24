@@ -24,7 +24,7 @@ DECLARE @lic_nbr VARCHAR(50) = 'APRN11034095';
 DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Nurse Prac%' AND mstr_list_type = 'provider_subgrouping');
 DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'St Augustin%');
 DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363LF0000X');
-DECLARE @user INT = 997;
+DECLARE @user INT = 1960;
 
 
 --exec csm_prov_add_fm @first_name=@first_name,@last_name=@last_name,@degree=@degree,@npi=@npi,@dea_nbr=@dea_nbr,@lic_nbr=@lic_nbr,@subgrouping2=@subgrouping2,@location_id=@location,@user_id=@user,@taxonomy=@tax
