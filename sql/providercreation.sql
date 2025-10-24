@@ -13,8 +13,6 @@ SELECT lm.location_name, ml.mstr_list_item_desc FROM location_mstr lm join mstr_
 WHERE ml.mstr_list_item_desc like '%FL' AND lm.delete_ind = 'N' ORDER by 1, 2
 */
 
---select * from location_mstr order by location_name
-
 DECLARE @first_name VARCHAR(25) = 'Steven';
 DECLARE @last_name VARCHAR(25) = 'Cohen';
 DECLARE @degree VARCHAR(15) = 'DO';
@@ -25,6 +23,9 @@ DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WH
 DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Metro W%');
 DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '207Q00000X');
 DECLARE @user INT = 1960;
+
+-- Check for PCP Recored:
+select provider_id, description, delete_ind, provider_type_pcp_ind, note from provider_mstr where national_provider_id = @npi
 
 
 --exec csm_prov_add_fm @first_name=@first_name,@last_name=@last_name,@degree=@degree,@npi=@npi,@dea_nbr=@dea_nbr,@lic_nbr=@lic_nbr,@subgrouping2=@subgrouping2,@location_id=@location,@user_id=@user,@taxonomy=@tax
@@ -68,8 +69,7 @@ SELECT @new_user,@practice,(SELECT location_name FROM location_mstr WHERE locati
 		EXEC sol_copy_provider_payers @practice_id=@practice, @current_Provider_id = @current,@New_Provider_id=@new, @user_id=@user;
 		EXEC CSP_My_Phrases_SP @user_name=@new_user_name,@user_id=@new_user,@entity = 'All',@type = 'All';
 		EXEC csm_paq_insertion @user_id=@user,@npi=@npi;
-		EXEC csm_prov_copy_meds @user_id=@user,@npi=@npi;
-		
+		EXEC csm_prov_copy_meds @user_id=@user,@npi=@npi;	
 	END 
 
 
