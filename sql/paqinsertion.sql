@@ -44,7 +44,7 @@ BEGIN
 																AND p.national_provider_id = @npi
 																)
 										);
-				DECLARE @location VARCHAR(36) = (SELECT location_id FROM location_mstr WHERE location_id= (SELECT primary_loc_id FROM provider_mstr WHERE national_provider_id = @npi));
+				DECLARE @location VARCHAR(36) = (SELECT location_id FROM location_mstr WHERE location_id= (SELECT primary_loc_id FROM provider_mstr WHERE national_provider_id = @npi AND provider_type_pcp_ind = 'N'));
 			END
 	
 	DECLARE @delegatecount INT = (SELECT COUNT(delegate_user_id) FROM [dbo].[workflow_prov_delegates] WHERE provider_id IN (SELECT DISTINCT provider_id FROM csm_paq_location_xref WHERE paq_market IN (SELECT paq_market FROM csm_paq_location_xref WHERE ng_location_id=@location)) AND delegate_user_id=@provider_user)	

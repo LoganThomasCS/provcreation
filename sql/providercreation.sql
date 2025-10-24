@@ -15,15 +15,15 @@ WHERE ml.mstr_list_item_desc like '%FL' AND lm.delete_ind = 'N' ORDER by 1, 2
 
 --select * from location_mstr order by location_name
 
-DECLARE @first_name VARCHAR(25) = 'Syuzanna';
-DECLARE @last_name VARCHAR(25) = 'Mecca';
-DECLARE @degree VARCHAR(15) = 'APRN';
-DECLARE @npi VARCHAR(15) = '1184460370';
-DECLARE @dea_nbr VARCHAR(15) = 'MM9860962';
-DECLARE @lic_nbr VARCHAR(50) = 'APRN11034095';
-DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Nurse Prac%' AND mstr_list_type = 'provider_subgrouping');
-DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'St Augustin%');
-DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363LF0000X');
+DECLARE @first_name VARCHAR(25) = 'Steven';
+DECLARE @last_name VARCHAR(25) = 'Cohen';
+DECLARE @degree VARCHAR(15) = 'DO';
+DECLARE @npi VARCHAR(15) = '1518018142';
+DECLARE @dea_nbr VARCHAR(15) = 'BC3527542';
+DECLARE @lic_nbr VARCHAR(50) = 'OS6551';
+DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Physicians%' AND mstr_list_type = 'provider_subgrouping');
+DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Metro W%');
+DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '207Q00000X');
 DECLARE @user INT = 1960;
 
 
@@ -39,7 +39,7 @@ DECLARE @user INT = 1960;
 
 
 DECLARE @current VARCHAR(36) = 'F441FEEE-4EF6-4581-B0DC-488DBD01E634';
-DECLARE @new VARCHAR(36) = (SELECT provider_id FROM provider_mstr WHERE national_provider_id = @npi);
+DECLARE @new VARCHAR(36) = (SELECT provider_id FROM provider_mstr WHERE national_provider_id = @npi and provider_type_pcp_ind = 'N');
 DECLARE @new_user int = (SELECT DISTINCT user_id
 							FROM user_mstr
 								WHERE provider_id IN (
@@ -50,7 +50,7 @@ DECLARE @new_user int = (SELECT DISTINCT user_id
 											JOIN provider_practice_mstr pp ON p.provider_id=pp.provider_id AND pp.attending_ind = 'Y'
 												WHERE p.delete_ind = 'N'
 													AND provider_type_pcp_ind = 'N'
-													AND p.national_provider_id =  @npi
+													AND p.national_provider_id = @npi
 													)
 						);
 
@@ -59,7 +59,7 @@ DECLARE @new_user_name VARCHAR(35) = (SELECT first_name+' '+last_name FROM user_
 DECLARE @practice CHAR(4) = (SELECT practice_id FROM csm_paq_location_xref where ng_location_id=@location)
 
 --Check to make sure variables are set correctly
-SELECT @new_user,@practice,(SELECT location_name FROM location_mstr WHERE location_id=@location) as home_center,@new_user_name, (SELECT provider_id from provider_mstr where national_provider_id = @npi)
+SELECT @new_user,@practice,(SELECT location_name FROM location_mstr WHERE location_id=@location) as home_center,@new_user_name, (SELECT provider_id from provider_mstr where national_provider_id = @npi and provider_type_pcp_ind = 'N')
 
 
 --Copy payers, contracts, phrases and inject the provider user account into PAQ delegate table, and copy the med faves to the new provider user account
