@@ -274,8 +274,10 @@
             document.getElementById('lookupBtn').disabled = true;
             
             try {
-                const url = `https://npiregistry.cms.hhs.gov/api/?number=${npi}&version=2.1`;
-                const response = await fetch(url);
+                // Use CORS proxy to bypass CORS restrictions
+                const apiUrl = `https://npiregistry.cms.hhs.gov/api/?number=${npi}&version=2.1`;
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
                 
                 if (!data.results || data.results.length === 0) {
