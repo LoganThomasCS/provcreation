@@ -9,23 +9,30 @@ Physician Assistants
 Physicians 
 
 --Run this to see location names:
-SELECT lm.location_name, ml.mstr_list_item_desc FROM location_mstr lm join mstr_lists ml ON ml.mstr_list_item_id = lm.location_subgrouping1_id
-WHERE ml.mstr_list_item_desc like '%FL' AND lm.delete_ind = 'N' ORDER by 1, 2
+select    x.practice_id
+		, lm.location_name
+		, x.alpha_loc_name
+		, lm.site_id
+		, lm.location_id
+from location_mstr lm
+	join csm_paq_location_xref x on lm.location_id = x.ng_location_id
+where lm.location_name like '%pomp%'
+order by x.practice_id
 */
 
-DECLARE @first_name VARCHAR(25) = 'Steven';
-DECLARE @last_name VARCHAR(25) = 'Cohen';
-DECLARE @degree VARCHAR(15) = 'DO';
-DECLARE @npi VARCHAR(15) = '1518018142';
-DECLARE @dea_nbr VARCHAR(15) = 'BC3527542';
-DECLARE @lic_nbr VARCHAR(50) = 'OS6551';
-DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Physicians%' AND mstr_list_type = 'provider_subgrouping');
-DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Metro W%');
-DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '207Q00000X');
+DECLARE @first_name VARCHAR(25) = 'Jaret';
+DECLARE @last_name VARCHAR(25) = 'Williams';
+DECLARE @degree VARCHAR(15) = 'PA-C';
+DECLARE @npi VARCHAR(15) = '1427486380';
+DECLARE @dea_nbr VARCHAR(15) = 'MW3049524';
+DECLARE @lic_nbr VARCHAR(50) = 'PA9120352';
+DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Physician A%' AND mstr_list_type = 'provider_subgrouping');
+DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Pompan%');
+DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363AM0700X');
 DECLARE @user INT = 1960;
 
 -- Check for PCP Recored:
-select provider_id, description, delete_ind, provider_type_pcp_ind, note from provider_mstr where national_provider_id = @npi
+ --select provider_id, description, delete_ind, provider_type_pcp_ind, note from provider_mstr where national_provider_id = @npi
 
 
 --exec csm_prov_add_fm @first_name=@first_name,@last_name=@last_name,@degree=@degree,@npi=@npi,@dea_nbr=@dea_nbr,@lic_nbr=@lic_nbr,@subgrouping2=@subgrouping2,@location_id=@location,@user_id=@user,@taxonomy=@tax
@@ -76,6 +83,7 @@ SELECT @new_user,@practice,(SELECT location_name FROM location_mstr WHERE locati
 /**********File Maintenance Rollback**************
 select p.provider_id
 		,p.description
+		, pp.practice_id
 		,(SELECT FORMAT(COUNT(*),'N0') FROM provider_practice_payers WHERE provider_id=p.provider_id and practice_id=pp.practice_id) payers
 		,(SELECT FORMAT(COUNT(*),'N0') FROM contract_links WHERE provider_id=p.provider_id and practice_id=pp.practice_id) AS contracts
 		--,(SELECT FORMAT(COUNT(*),'N0') FROM ngkbm_my_phrases_ WHERE userID=um.user_id) as phrases 
@@ -83,7 +91,7 @@ select p.provider_id
 from provider_mstr p
 	join provider_practice_mstr pp on p.provider_id=pp.provider_id
 		
-	where description like 'dawkins pa%'
+	where description like 'Williams pa%'
 		group by p.provider_id
 				,p.description
 				,pp.practice_id
