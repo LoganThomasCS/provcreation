@@ -16,19 +16,19 @@ select    x.practice_id
 		, lm.location_id
 from location_mstr lm
 	join csm_paq_location_xref x on lm.location_id = x.ng_location_id
-where lm.location_name like '%pomp%'
+where lm.location_name like '%Westside%'
 order by x.practice_id
 */
 
-DECLARE @first_name VARCHAR(25) = 'Jaret';
-DECLARE @last_name VARCHAR(25) = 'Williams';
+DECLARE @first_name VARCHAR(25) = 'Melissa';
+DECLARE @last_name VARCHAR(25) = 'Kotziers';
 DECLARE @degree VARCHAR(15) = 'PA-C';
-DECLARE @npi VARCHAR(15) = '1427486380';
-DECLARE @dea_nbr VARCHAR(15) = 'MW3049524';
-DECLARE @lic_nbr VARCHAR(50) = 'PA9120352';
+DECLARE @npi VARCHAR(15) = '1659116861';
+DECLARE @dea_nbr VARCHAR(15) = 'MK0144775';
+DECLARE @lic_nbr VARCHAR(50) = 'PA9120800';
 DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Physician A%' AND mstr_list_type = 'provider_subgrouping');
-DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Pompan%');
-DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363AM0700X');
+DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Westsid%');
+DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363A00000X');
 DECLARE @user INT = 1960;
 
 -- Check for PCP Recored:
