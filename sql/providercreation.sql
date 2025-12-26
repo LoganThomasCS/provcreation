@@ -20,14 +20,14 @@ where lm.location_name like '%Westside%'
 order by x.practice_id
 */
 
-DECLARE @first_name VARCHAR(25) = 'Melissa';
-DECLARE @last_name VARCHAR(25) = 'Kotziers';
-DECLARE @degree VARCHAR(15) = 'PA-C';
-DECLARE @npi VARCHAR(15) = '1659116861';
-DECLARE @dea_nbr VARCHAR(15) = 'MK0144775';
-DECLARE @lic_nbr VARCHAR(50) = 'PA9120800';
+DECLARE @first_name VARCHAR(25) = 'Stanley';
+DECLARE @last_name VARCHAR(25) = 'Joseph';
+DECLARE @degree VARCHAR(15) = 'PA';
+DECLARE @npi VARCHAR(15) = '1447857719';
+DECLARE @dea_nbr VARCHAR(15) = 'MJ9731387';
+DECLARE @lic_nbr VARCHAR(50) = 'PA9120163';
 DECLARE @subgrouping2 VARCHAR(36) = (SELECT mstr_list_item_id FROM mstr_lists WHERE mstr_list_item_desc like 'Physician A%' AND mstr_list_type = 'provider_subgrouping');
-DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_name LIKE 'Westsid%');
+DECLARE @location UNIQUEIDENTIFIER = (SELECT DISTINCT location_id FROM location_mstr WHERE location_id = '57BAA0C7-721D-4F6C-8DB5-269EE3CF9909');
 DECLARE @tax  VARCHAR(36) = (SELECT taxonomy_id FROM taxonomy_mstr tm WHERE tm.taxonomy_code = '363A00000X');
 DECLARE @user INT = 1960;
 
@@ -48,7 +48,7 @@ DECLARE @user INT = 1960;
 
 DECLARE @current VARCHAR(36) = 'F441FEEE-4EF6-4581-B0DC-488DBD01E634';
 DECLARE @new VARCHAR(36) = (SELECT provider_id FROM provider_mstr WHERE national_provider_id = @npi and provider_type_pcp_ind = 'N');
-DECLARE @new_user int = (SELECT DISTINCT user_id
+DECLARE @new_user_id int = (SELECT DISTINCT user_id
 							FROM user_mstr
 								WHERE provider_id IN (
 									SELECT DISTINCT p.provider_id 
@@ -63,18 +63,18 @@ DECLARE @new_user int = (SELECT DISTINCT user_id
 						);
 
 --Set variables for Stored Procedures
-DECLARE @new_user_name VARCHAR(35) = (SELECT first_name+' '+last_name FROM user_mstr WHERE user_id = @new_user)
+DECLARE @new_user_name VARCHAR(35) = (SELECT first_name+' '+last_name FROM user_mstr WHERE user_id = @new_user_id)
 DECLARE @practice CHAR(4) = (SELECT practice_id FROM csm_paq_location_xref where ng_location_id=@location)
 
 --Check to make sure variables are set correctly
-SELECT @new_user,@practice,(SELECT location_name FROM location_mstr WHERE location_id=@location) as home_center,@new_user_name, (SELECT provider_id from provider_mstr where national_provider_id = @npi and provider_type_pcp_ind = 'N')
+SELECT @new_user_id new_user_id,@practice practice,(SELECT location_name FROM location_mstr WHERE location_id=@location) as home_center,@new_user_name new_user_name, (SELECT provider_id from provider_mstr where national_provider_id = @npi and provider_type_pcp_ind = 'N') provider_id
 
 
 --Copy payers, contracts, phrases and inject the provider user account into PAQ delegate table, and copy the med faves to the new provider user account
 	BEGIN
 		EXEC sol_copy_provider_contracts @practice_id=@practice, @current_Provider_id = @current,@New_Provider_id=@new, @user_id=@user;
 		EXEC sol_copy_provider_payers @practice_id=@practice, @current_Provider_id = @current,@New_Provider_id=@new, @user_id=@user;
-		EXEC CSP_My_Phrases_SP @user_name=@new_user_name,@user_id=@new_user,@entity = 'All',@type = 'All';
+		EXEC CSP_My_Phrases_SP @user_name=@new_user_name,@user_id=@new_user_id,@entity = 'All',@type = 'All';
 		EXEC csm_paq_insertion @user_id=@user,@npi=@npi;
 		EXEC csm_prov_copy_meds @user_id=@user,@npi=@npi;	
 	END 
